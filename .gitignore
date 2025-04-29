@@ -1,5 +1,88 @@
 # Gradle files
-.gradle/
+.gradle/let userPoints = 0;
+let usersNearby = [
+    { name: "أحمد", lat: 33.3, lon: 44.3 },
+    { name: "سارة", lat: 33.31, lon: 44.29 }
+];
+
+function fakeLogin() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    loadLeaderboard();
+    notifyDaily();
+}
+
+function completeChallenge() {
+    userPoints += 10;
+    alert("تم إكمال التحدي! تم إضافة 10 نقاط.");
+    loadLeaderboard();
+}
+
+function viewNearbyChallenges() {
+    alert("أظهر تحديات لأشخاص بالقرب منك!");
+}
+
+function startLiveChallenge() {
+    alert("بدء بث مباشر لتحدي الآن!");
+}
+
+function goToProfile() {
+    document.getElementById('appScreen').classList.add('hidden');
+    document.getElementById('profileScreen').classList.remove('hidden');
+}
+
+function backToApp() {
+    document.getElementById('profileScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+}
+
+function saveProfile(e) {
+    e.preventDefault();
+    alert("تم حفظ الملف الشخصي!");
+    backToApp();
+}
+
+function showMap() {
+    const mapDiv = document.getElementById('mapContainer');
+    mapDiv.classList.remove('hidden');
+    const map = L.map('mapContainer').setView([33.312805, 44.361488], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    usersNearby.forEach(user => {
+        const marker = L.marker([user.lat, user.lon]).addTo(map);
+        marker.bindPopup(`<b>${user.name}</b><br>اضغط لعرض الملف الشخصي.`).on('click', () => goToProfile());
+    });
+}
+
+function loadLeaderboard() {
+    const list = document.getElementById('ranking');
+    list.innerHTML = "";
+    const players = [
+        { name: "أنت", score: userPoints },
+        { name: "أحمد", score: 80 },
+        { name: "سارة", score: 65 }
+    ];
+    players.sort((a, b) => b.score - a.score);
+    players.forEach(player => {
+        const li = document.createElement('li');
+        li.textContent = `${player.name} - ${player.score} نقطة`;
+        list.appendChild(li);
+    });
+}
+
+function notifyDaily() {
+    if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification("جاهز للتحدي اليوم؟", {
+                    body: "افتح التطبيق الآن وخذ التحدي الجديد!"
+                });
+            }
+        });
+    }
+}
+
 build/
 
 # Local configuration file (sdk path, etc)
